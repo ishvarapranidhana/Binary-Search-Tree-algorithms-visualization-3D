@@ -15,8 +15,8 @@ function App() {
         camera={{
           position: [0, 8, 15],
           fov: 45,
-          near: 0.1,
-          far: 1000
+          near: 0.01,
+          far: 2000
         }}
         gl={{
           antialias: true,

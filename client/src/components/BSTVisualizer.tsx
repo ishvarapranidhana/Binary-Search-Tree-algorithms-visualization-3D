@@ -235,15 +235,7 @@ export default function BSTVisualizer() {
         );
       })}
       
-      {/* Ground plane for reference */}
-      <mesh position={[0, -8, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial 
-          color="#111" 
-          transparent 
-          opacity={0.3}
-        />
-      </mesh>
+
     </group>
   );
 }
