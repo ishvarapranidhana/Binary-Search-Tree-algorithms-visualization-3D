@@ -45,8 +45,8 @@ function App() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={5}
-          maxDistance={50}
+          minDistance={3}
+          maxDistance={150}
           target={[0, 0, 0]}
         />
         

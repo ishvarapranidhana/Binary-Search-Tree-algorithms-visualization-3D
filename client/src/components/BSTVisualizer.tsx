@@ -38,7 +38,7 @@ export default function BSTVisualizer() {
     const sphereRadius = 1;
     const minPadding = sphereRadius / 3;
     const minVerticalSpacing = (sphereRadius * 2) + (minPadding * 2);
-    const actualVerticalSpacing = Math.max(3.5, minVerticalSpacing * 1.0);
+    const actualVerticalSpacing = Math.max(2.5, minVerticalSpacing * 0.7); // 30% closer
     
     // Calculate subtree widths
     const leftSubtreeWidth = getSubtreeWidth(node.left);
@@ -55,7 +55,7 @@ export default function BSTVisualizer() {
     // Allocate space for children based on their subtree sizes
     if (node.left || node.right) {
       const availableWidth = rightBound - leftBound;
-      const minSpacing = 2; // Minimum spacing between subtrees (50% closer)
+      const minSpacing = 1.4; // Minimum spacing between subtrees (30% closer from previous)
       
       if (totalWidth > 0) {
         const leftRatio = leftSubtreeWidth / totalWidth;
