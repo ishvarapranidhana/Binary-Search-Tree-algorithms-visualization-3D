@@ -65,7 +65,7 @@ export default function BSTVisualizer() {
   const nodePositions = tree ? calculateNodePositions(tree) : new Map();
   const allNodes = tree ? getAllNodes(tree) : [];
 
-  // Create connections between nodes
+  // Create neon connections between nodes
   const createConnections = () => {
     const connections: JSX.Element[] = [];
     
@@ -80,17 +80,66 @@ export default function BSTVisualizer() {
         const length = direction.length();
         const midpoint = start.clone().add(direction.clone().multiplyScalar(0.5));
         
+        // Check if this connection is part of the search path
+        const isInSearchPath = searchPath.includes(parent.value) && searchPath.includes(child.value);
+        const parentIndex = searchPath.indexOf(parent.value);
+        const childIndex = searchPath.indexOf(child.value);
+        const isConsecutiveInPath = isInSearchPath && Math.abs(parentIndex - childIndex) === 1;
+        
+        // Calculate rotation to align cylinder with the connection line
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+        
+        // Colors based on search path
+        const tubeColor = isConsecutiveInPath ? "#ff6b35" : "#00ff44";
+        const coreColor = isConsecutiveInPath ? "#ffaa66" : "#88ff88";
+        const glowColor = isConsecutiveInPath ? "#ff6b35" : "#00ff44";
+        const lightColor = isConsecutiveInPath ? "#ff6b35" : "#00ff44";
+        const intensity = isConsecutiveInPath ? 1.2 : 0.8;
+        const glowIntensity = isConsecutiveInPath ? 0.8 : 0.5;
+        
         connections.push(
           <group key={`connection-${index}`} position={[midpoint.x, midpoint.y, midpoint.z]}>
-            <mesh rotation={[0, 0, Math.atan2(direction.y, direction.x)]}>
-              <cylinderGeometry args={[0.05, 0.05, length, 8]} />
+            {/* Main neon tube */}
+            <mesh quaternion={quaternion}>
+              <cylinderGeometry args={[0.08, 0.08, length, 16]} />
               <meshStandardMaterial 
-                color="#333" 
-                emissive="#111"
+                color={tubeColor} 
+                emissive={tubeColor}
+                emissiveIntensity={intensity}
                 transparent
-                opacity={0.6}
+                opacity={0.9}
               />
             </mesh>
+            
+            {/* Inner bright core */}
+            <mesh quaternion={quaternion}>
+              <cylinderGeometry args={[0.04, 0.04, length, 8]} />
+              <meshBasicMaterial 
+                color={coreColor}
+                transparent
+                opacity={1.0}
+              />
+            </mesh>
+            
+            {/* Outer glow effect */}
+            <mesh quaternion={quaternion}>
+              <cylinderGeometry args={[0.15, 0.15, length, 8]} />
+              <meshBasicMaterial 
+                color={glowColor}
+                transparent
+                opacity={isConsecutiveInPath ? 0.4 : 0.2}
+                side={THREE.BackSide}
+              />
+            </mesh>
+            
+            {/* Point light for neon glow */}
+            <pointLight
+              position={[0, 0, 0]}
+              intensity={glowIntensity}
+              distance={3}
+              color={lightColor}
+            />
           </group>
         );
       }
