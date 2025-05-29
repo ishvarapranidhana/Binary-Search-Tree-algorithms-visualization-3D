@@ -16,8 +16,7 @@ export default function BSTVisualizer() {
   const groupRef = useRef<Group>(null);
   const { tree, searchPath, isSearching } = useBST();
 
-  // Debug logging
-  console.log("BSTVisualizer render:", { tree, searchPath, isSearching });
+
 
   // Calculate positions for nodes in the tree
   const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 8): Map<number, NodePosition> => {

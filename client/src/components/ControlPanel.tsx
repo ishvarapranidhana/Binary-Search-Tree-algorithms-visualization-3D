@@ -56,7 +56,7 @@ export default function ControlPanel() {
   };
 
   const handleGenerateRandom = () => {
-    generateRandomTree(7);
+    generateRandomTree(22);
   };
 
   const getTreeStats = () => {

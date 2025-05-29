@@ -92,5 +92,5 @@ export const useBST = create<BSTState>()(
 
 // Initialize with a random tree on app start
 setTimeout(() => {
-  useBST.getState().generateRandomTree(7);
+  useBST.getState().generateRandomTree(22);
 }, 100);

@@ -14,16 +14,18 @@ export default function MetallicSphere({ value, isHighlighted = false, isInSearc
   const meshRef = useRef<Mesh>(null);
   const glowRef = useRef<Mesh>(null);
   
-  // Create custom metallic material
+  // Create custom metallic material with white/silver base
   const material = useMemo(() => {
     const mat = new THREE.MeshPhysicalMaterial({
-      color: isHighlighted ? '#ff6b35' : isInSearchPath ? '#00ff88' : '#888888',
-      metalness: 0.9,
-      roughness: 0.1,
+      color: isHighlighted ? '#ff6b35' : isInSearchPath ? '#00ff88' : '#f0f0f0',
+      metalness: 0.95,
+      roughness: 0.05,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
+      clearcoatRoughness: 0.02,
       reflectivity: 1.0,
-      envMapIntensity: 1.5,
+      envMapIntensity: 2.0,
+      transmission: 0.1,
+      ior: 2.4,
     });
     return mat;
   }, [isHighlighted, isInSearchPath]);
