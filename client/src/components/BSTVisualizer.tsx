@@ -18,20 +18,25 @@ export default function BSTVisualizer() {
 
 
 
-  // Calculate positions for nodes in the tree
-  const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 8): Map<number, NodePosition> => {
+  // Calculate positions for nodes in the tree with proper spacing
+  const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 12): Map<number, NodePosition> => {
     const positions = new Map<number, NodePosition>();
     
     if (!node) return positions;
     
+    // Sphere radius is 1, so minimum spacing should be 1/3 = 0.33, but we'll use more for better visibility
+    const sphereRadius = 1;
+    const minPadding = sphereRadius / 3;
+    const minSpacing = (sphereRadius * 2) + (minPadding * 2); // Total minimum distance between sphere centers
+    
     const x = offset;
-    const y = -depth * 3; // Vertical spacing between levels
+    const y = -depth * (minSpacing + 1); // Vertical spacing between levels with padding
     const z = 0;
     
     positions.set(node.value, { x, y, z });
     
-    // Calculate positions for children
-    const childSpread = spread / 2;
+    // Calculate positions for children with proper horizontal spacing
+    const childSpread = Math.max(spread / 2, minSpacing);
     
     if (node.left) {
       const leftPositions = calculateNodePositions(
