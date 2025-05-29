@@ -80,7 +80,6 @@ export default function MetallicSphere({ value, isHighlighted = false, isInSearc
         color={isHighlighted ? '#ffffff' : isInSearchPath ? '#ffffff' : '#00ff88'}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/inter.json"
       >
         {formattedValue}
       </Text>
