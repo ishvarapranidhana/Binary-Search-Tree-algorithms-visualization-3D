@@ -18,25 +18,30 @@ export default function BSTVisualizer() {
 
 
 
-  // Calculate positions for nodes in the tree with proper spacing
-  const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 12): Map<number, NodePosition> => {
+  // Calculate positions for nodes in the tree with proper spacing to avoid overlaps
+  const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 20): Map<number, NodePosition> => {
     const positions = new Map<number, NodePosition>();
     
     if (!node) return positions;
     
-    // Sphere radius is 1, so minimum spacing should be 1/3 = 0.33, but we'll use more for better visibility
+    // Sphere radius is 1, minimum padding is 1/3 = 0.33
     const sphereRadius = 1;
     const minPadding = sphereRadius / 3;
-    const minSpacing = (sphereRadius * 2) + (minPadding * 2); // Total minimum distance between sphere centers
+    const minHorizontalSpacing = (sphereRadius * 2) + (minPadding * 2); // 2.67 minimum
+    const minVerticalSpacing = (sphereRadius * 2) + (minPadding * 2); // 2.67 minimum
+    
+    // Use larger spacing to ensure no overlaps, especially for deeper trees
+    const actualHorizontalSpacing = Math.max(spread, minHorizontalSpacing * 1.5);
+    const actualVerticalSpacing = Math.max(4, minVerticalSpacing * 1.5);
     
     const x = offset;
-    const y = -depth * (minSpacing + 1); // Vertical spacing between levels with padding
+    const y = -depth * actualVerticalSpacing;
     const z = 0;
     
     positions.set(node.value, { x, y, z });
     
-    // Calculate positions for children with proper horizontal spacing
-    const childSpread = Math.max(spread / 2, minSpacing);
+    // Calculate positions for children with exponentially reducing spread
+    const childSpread = Math.max(actualHorizontalSpacing / 1.8, minHorizontalSpacing * 1.2);
     
     if (node.left) {
       const leftPositions = calculateNodePositions(
