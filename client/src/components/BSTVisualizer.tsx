@@ -18,8 +18,18 @@ export default function BSTVisualizer() {
 
 
 
-  // Calculate positions for nodes in the tree with proper spacing to avoid overlaps
-  const calculateNodePositions = (node: any, depth = 0, offset = 0, spread = 20): Map<number, NodePosition> => {
+  // Calculate node subtree width to prevent edge crossings
+  const getSubtreeWidth = (node: any): number => {
+    if (!node) return 0;
+    if (!node.left && !node.right) return 1;
+    
+    const leftWidth = getSubtreeWidth(node.left);
+    const rightWidth = getSubtreeWidth(node.right);
+    return leftWidth + rightWidth;
+  };
+
+  // Calculate positions for nodes in the tree preventing edge crossings
+  const calculateNodePositions = (node: any, depth = 0, leftBound = -50, rightBound = 50): Map<number, NodePosition> => {
     const positions = new Map<number, NodePosition>();
     
     if (!node) return positions;
@@ -27,40 +37,57 @@ export default function BSTVisualizer() {
     // Sphere radius is 1, minimum padding is 1/3 = 0.33
     const sphereRadius = 1;
     const minPadding = sphereRadius / 3;
-    const minHorizontalSpacing = (sphereRadius * 2) + (minPadding * 2); // 2.67 minimum
-    const minVerticalSpacing = (sphereRadius * 2) + (minPadding * 2); // 2.67 minimum
+    const minVerticalSpacing = (sphereRadius * 2) + (minPadding * 2);
+    const actualVerticalSpacing = Math.max(5, minVerticalSpacing * 1.5);
     
-    // Use larger spacing to ensure no overlaps, especially for deeper trees
-    const actualHorizontalSpacing = Math.max(spread, minHorizontalSpacing * 1.5);
-    const actualVerticalSpacing = Math.max(4, minVerticalSpacing * 1.5);
+    // Calculate subtree widths
+    const leftSubtreeWidth = getSubtreeWidth(node.left);
+    const rightSubtreeWidth = getSubtreeWidth(node.right);
+    const totalWidth = leftSubtreeWidth + rightSubtreeWidth;
     
-    const x = offset;
+    // Position this node in the center of its allocated space
+    const centerX = (leftBound + rightBound) / 2;
     const y = -depth * actualVerticalSpacing;
     const z = 0;
     
-    positions.set(node.value, { x, y, z });
+    positions.set(node.value, { x: centerX, y, z });
     
-    // Calculate positions for children with exponentially reducing spread
-    const childSpread = Math.max(actualHorizontalSpacing / 1.8, minHorizontalSpacing * 1.2);
-    
-    if (node.left) {
-      const leftPositions = calculateNodePositions(
-        node.left, 
-        depth + 1, 
-        offset - childSpread, 
-        childSpread
-      );
-      leftPositions.forEach((pos, value) => positions.set(value, pos));
-    }
-    
-    if (node.right) {
-      const rightPositions = calculateNodePositions(
-        node.right, 
-        depth + 1, 
-        offset + childSpread, 
-        childSpread
-      );
-      rightPositions.forEach((pos, value) => positions.set(value, pos));
+    // Allocate space for children based on their subtree sizes
+    if (node.left || node.right) {
+      const availableWidth = rightBound - leftBound;
+      const minSpacing = 4; // Minimum spacing between subtrees
+      
+      if (totalWidth > 0) {
+        const leftRatio = leftSubtreeWidth / totalWidth;
+        const rightRatio = rightSubtreeWidth / totalWidth;
+        
+        // Calculate boundaries ensuring minimum spacing
+        const leftWidth = Math.max(leftRatio * (availableWidth - minSpacing), minSpacing);
+        const rightWidth = Math.max(rightRatio * (availableWidth - minSpacing), minSpacing);
+        
+        const leftRightBound = leftBound + leftWidth;
+        const rightLeftBound = leftRightBound + minSpacing;
+        
+        if (node.left) {
+          const leftPositions = calculateNodePositions(
+            node.left, 
+            depth + 1, 
+            leftBound,
+            leftRightBound
+          );
+          leftPositions.forEach((pos, value) => positions.set(value, pos));
+        }
+        
+        if (node.right) {
+          const rightPositions = calculateNodePositions(
+            node.right, 
+            depth + 1, 
+            rightLeftBound,
+            rightBound
+          );
+          rightPositions.forEach((pos, value) => positions.set(value, pos));
+        }
+      }
     }
     
     return positions;
